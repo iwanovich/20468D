@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using ShirtStoreWebsite.Data;
 using Microsoft.EntityFrameworkCore;
+using ShirtStoreWebsite.Services;
 
 namespace ShirtStoreWebsite
 {
@@ -23,6 +24,7 @@ namespace ShirtStoreWebsite
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IShirtRepository, ShirtRepository>();
             services.AddDbContext<ShirtContext>(options =>
                  options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
 
@@ -34,7 +36,19 @@ namespace ShirtStoreWebsite
             shirtContext.Database.EnsureDeleted();
             shirtContext.Database.EnsureCreated();
 
+            
+
             app.UseStaticFiles();
+
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/error.html");
+            }
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
